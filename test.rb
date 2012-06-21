@@ -1,7 +1,7 @@
 # Instructions list
 #
 # write value to register:
-# WRITE regname, value
+# WRITE value, regname
 #
 # sum register D0 and D1 and write result to R0
 # SUM
@@ -19,8 +19,8 @@ processor = Processor.new
 # calculate sum of 2 integers and write result to R0
 # SUM
 processor.run_program <<PROGRAM
-WRITE D0, 1  
-WRITE D1, 2  
+WRITE 1, D0
+WRITE 2, D1
 SUM
 PROGRAM
 
@@ -33,10 +33,12 @@ JUMP @cycle
 @cycle
 READ_MEM 6, D0
 JUMPX @end, D0
-READ_MEM 3, D1
-READ_MEM 9, D2
+READ_MEM 3, D0
+READ_MEM 9, D1
 SUM
 READ_MEM 9, D0
+WRITE 1, D1
+SUB
 JUMP @cycle
 @end
 PROGRAM
