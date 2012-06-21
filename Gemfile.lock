@@ -1,11 +1,15 @@
 PATH
   remote: .
   specs:
-    blah_processor (0.0.1)
+    blah_machine (0.0.1)
+      activesupport
 
 GEM
   remote: https://rubygems.org/
   specs:
+    activesupport (3.2.2)
+      i18n (~> 0.6)
+      multi_json (~> 1.0)
     diff-lcs (1.1.3)
     ffi (1.0.11)
     guard (1.2.1)
@@ -13,10 +17,12 @@ GEM
       thor (>= 0.14.6)
     guard-rspec (1.1.0)
       guard (>= 1.1)
+    i18n (0.6.0)
     listen (0.4.6)
       rb-fchange (~> 0.0.5)
       rb-fsevent (~> 0.9.1)
       rb-inotify (~> 0.8.8)
+    multi_json (1.1.0)
     rb-fchange (0.0.5)
       ffi
     rb-fsevent (0.9.1)
@@ -36,6 +42,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  blah_processor!
+  blah_machine!
   guard-rspec
   rspec

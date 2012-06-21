@@ -14,4 +14,8 @@ Gem::Specification.new do |gem|
   gem.name          = "blah_machine"
   gem.require_paths = ["lib"]
   gem.version       = BlahMachine::VERSION
+
+  gem.add_development_dependency "rspec"
+  gem.add_development_dependency "guard-rspec"
+  gem.add_dependency "activesupport"
 end
