@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/blah_processor/version', __FILE__)
+require File.expand_path('../lib/blah_machine/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Sergei O. Udalov"]
@@ -11,7 +11,7 @@ Gem::Specification.new do |gem|
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.name          = "blah_processor"
+  gem.name          = "blah_machine"
   gem.require_paths = ["lib"]
-  gem.version       = BlahProcessor::VERSION
+  gem.version       = BlahMachine::VERSION
 end

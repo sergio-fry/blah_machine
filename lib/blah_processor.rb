@@ -1,5 +1,5 @@
-require "blah_processor/version"
+require "blah_machine/version"
 
-module BlahProcessor
+module BlahMachine
   # Your code goes here...
 end
