@@ -28,7 +28,7 @@ module BlahMachine
     def execute_current_instruction
       case read_register(REGISTER_C0)
       when SUM
-        write_register(REGISTER_R0, read_register(REGISTER_D0) + read_register(REGISTER_D1))
+        write_register(REGISTER_R0, read_register(read_register(REGISTER_D0)) + read_register(read_register(REGISTER_D1)))
       when WRITE
         write_register(read_register(REGISTER_D1), read_register(REGISTER_D0))
       when JUMP

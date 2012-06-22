@@ -59,7 +59,7 @@ module BlahMachine
         write_instruction(@processor, Processor::READ_MEM, 10, Processor::REGISTER_X0)
         @processor.next_cycle
 
-        write_instruction(@processor, Processor::SUM, 1, 2)
+        write_instruction(@processor, Processor::SUM, Processor::REGISTER_X0, Processor::REGISTER_X1)
         @processor.next_cycle
 
         @processor.read_register(Processor::REGISTER_M4).should eq(Memory::IDLE)
@@ -71,7 +71,9 @@ module BlahMachine
     describe "instruction" do
       describe "SUM" do
         it "should write result to R0" do
-          write_instruction(@processor, Processor::SUM, 4, 3)
+          @processor.write_register(Processor::REGISTER_X0, 4)
+          @processor.write_register(Processor::REGISTER_X1, 3)
+          write_instruction(@processor, Processor::SUM, Processor::REGISTER_X0, Processor::REGISTER_X1)
 
           @processor.next_cycle
 
