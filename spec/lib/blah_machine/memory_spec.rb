@@ -14,6 +14,9 @@ module BlahMachine
     it "should be possible to write cell" do
       @memory.write(0, 1)
       @memory.read(0).should eq(1)
+
+      @memory.write(64.kilobytes - 1, 1)
+      @memory.read(64.kilobytes - 1).should eq(1)
     end
 
     it "should not be possible use negative address" do

@@ -10,7 +10,7 @@ module BlahMachine
 
     it "should not be possible to write large value" do
       lambda do
-        MachineWord.new(2 ** 31)
+        MachineWord.new(64.kilobytes)
       end.should raise_error(MachineWord::ValueIsOutOfRange)
     end
 

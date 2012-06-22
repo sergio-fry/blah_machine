@@ -2,7 +2,7 @@ module BlahMachine
   class MachineWord
     class ValueIsOutOfRange < StandardError; end;
 
-    MAX_VALUE = 2 ** 16
+    MAX_VALUE = 2 ** 16 - 1
 
     attr_reader :value
 
