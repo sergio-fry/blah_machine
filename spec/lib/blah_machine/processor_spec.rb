@@ -28,12 +28,24 @@ module BlahMachine
         @processor.write_register(Processor::REGISTER_C0, 1)
         @processor.registers[Processor::REGISTER_C0].value.should eq(1)
       end
+
+      it "should raise error if trying to access undefined register" do
+        lambda do
+          @processor.write_register(123, 1)
+        end.should raise_error(Processor::UndefinedRegister)
+      end
     end
 
     describe "#read_register" do
       it "should return value of register" do
         @processor.write_register(Processor::REGISTER_C0, 2)
         @processor.read_register(Processor::REGISTER_C0).should eq(2)
+      end
+
+      it "should raise error if trying to access undefined register" do
+        lambda do
+          @processor.read_register(123)
+        end.should raise_error(Processor::UndefinedRegister)
       end
     end
 
@@ -139,17 +151,31 @@ module BlahMachine
       end
 
       describe "READ_MEM" do
-        it "should write READ instruction to M4-M5" do
+        it "should write READ instruction to M4-M6" do
           @processor.write_register(Processor::REGISTER_M1, Processor::READ_MEM)
           @processor.write_register(Processor::REGISTER_M2, 64)
+          @processor.write_register(Processor::REGISTER_M3, Processor::REGISTER_X0)
 
           @processor.next_cycle
 
           @processor.read_register(Processor::REGISTER_M4).should eq(Memory::READ)
           @processor.read_register(Processor::REGISTER_M5).should eq(64)
+          @processor.read_register(Processor::REGISTER_M6).should eq(Processor::REGISTER_X0)
         end
 
-        it "should copy value from MEM to defined register"
+        it "should copy value from MEM to defined register" do
+          @processor.write_register(Processor::REGISTER_M1, Processor::READ_MEM)
+          @processor.write_register(Processor::REGISTER_M2, 64)
+          @processor.write_register(Processor::REGISTER_M3, Processor::REGISTER_X0)
+
+          @processor.next_cycle
+
+          # data read from MEM
+          @processor.write_register(Processor::REGISTER_M5, 47)
+          @processor.next_cycle
+
+          @processor.read_register(Processor::REGISTER_X0).should eq(47)
+        end
       end
 
       describe "WRITE_MEM" do

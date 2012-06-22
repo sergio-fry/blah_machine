@@ -18,6 +18,12 @@ module BlahMachine
 
     private
 
+    def copy_value_fetch_from_memory
+      if read_register(REGISTER_M4) == Memory::READ
+        write_register(read_register(REGISTER_M6), read_register(REGISTER_M5))
+      end
+    end
+
     # excute instruction, located in C0
     def execute_current_instruction
       case read_register(REGISTER_C0)
@@ -32,6 +38,7 @@ module BlahMachine
       when READ_MEM
         write_register(REGISTER_M4, Memory::READ)
         write_register(REGISTER_M5, read_register(REGISTER_D0))
+        write_register(REGISTER_M6, read_register(REGISTER_D1))
       when WRITE_MEM
         write_register(REGISTER_M4, Memory::WRITE)
         write_register(REGISTER_M5, read_register(REGISTER_D0))
@@ -43,6 +50,7 @@ module BlahMachine
 
     # System Pre Cycle. Executed before Users Cycle
     def pre_cycle
+      copy_value_fetch_from_memory
       copy_command_and_data_from_memory_registers
       initialize_memory_instruction_registers
     end
