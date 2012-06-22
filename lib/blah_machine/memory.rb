@@ -2,6 +2,11 @@ module BlahMachine
   class Memory
     class AddressIsOutOfRange < StandardError; end;
 
+    # Instructions
+    IDLE = 0
+    READ = 1
+    WRITE = 2
+
     def initialize(capacity)
       @data  = (0..capacity-1).to_a.map { MachineWord.new(0) }
       @capacity = capacity
