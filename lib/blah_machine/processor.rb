@@ -1,60 +1,8 @@
 module BlahMachine
   class Processor
     class UnknownInstruction < StandardError; end;
-
-    ###############################################
-    # Registers inxedes
-
-    # Command
-    REGISTER_C0 = 0
-
-    # Data
-    REGISTER_D0 = 10
-    REGISTER_D1 = 11
-
-    # Result
-    REGISTER_R0 = 20
-
-    # RAM
-    #
-    # Every cycle next command and its arguments
-    # are loaded to M1-M3 registers from RAM.
-    #
-    REGISTER_M0 = 30 # pointer to next command
-    REGISTER_M1 = 31 # command
-    REGISTER_M2 = 32 # data
-    REGISTER_M3 = 33 # data
-
-    # command for memory module
-    REGISTER_M4 = 34 # memory command
-    REGISTER_M5 = 35 # data
-    REGISTER_M6 = 36 # data
-
-    REGISTER_INDEXES = [
-      REGISTER_C0,
-      REGISTER_D0,
-      REGISTER_D1,
-      REGISTER_R0,
-      REGISTER_M0,
-      REGISTER_M1,
-      REGISTER_M2,
-      REGISTER_M3,
-      REGISTER_M4,
-      REGISTER_M5,
-      REGISTER_M6
-    ]
-
-    ###############################################
-    # Instructions
-
-    SUM = 100
-    JUMP = 110
-    JUMPX = 111
-    WRITE = 120
-    READ_MEM = 130
-    WRITE_MEM = 131
-
-    attr_reader :registers
+    include ProcessorRegisters
+    include ProcessorInstructions
 
     def initialize
       @registers = {}
@@ -67,6 +15,8 @@ module BlahMachine
       user_cycle
       after_cycle
     end
+
+    private
 
     # excute instruction, located in C0
     def execute_current_instruction
@@ -90,16 +40,6 @@ module BlahMachine
         raise UnknownInstruction.new("Instruction '#{read_register(REGISTER_C0)}' is undefined")
       end
     end
-
-    def read_register(index)
-      @registers[index].value
-    end
-
-    def write_register(index, value)
-      @registers[index] = MachineWord.new(value)
-    end
-
-    private
 
     # System Pre Cycle. Executed before Users Cycle
     def pre_cycle
