@@ -28,17 +28,5 @@ module BlahMachine
         @memory.write(64.kilobytes, 1)
       end.should raise_error(Memory::AddressIsOutOfRange)
     end
-
-    it "should not be possible to write negative value" do
-      lambda do
-        @memory.write(0, -1)
-      end.should raise_error(Memory::ValueIsOutOfRange)
-    end
-
-    it "should not be possible to write large value" do
-      lambda do
-        @memory.write(0, 2 ** 32)
-      end.should raise_error(Memory::ValueIsOutOfRange)
-    end
   end
 end

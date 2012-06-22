@@ -1,12 +1,9 @@
 module BlahMachine
   class Memory
-    MAX_VALUE = 2 ** 16
-
     class AddressIsOutOfRange < StandardError; end;
-    class ValueIsOutOfRange < StandardError; end;
 
     def initialize(capacity)
-      @data  = Array.new(capacity, 0)
+      @data  = (0..capacity-1).to_a.map { MachineWord.new(0) }
       @capacity = capacity
     end
 
@@ -19,15 +16,11 @@ module BlahMachine
         raise AddressIsOutOfRange.new("Address '#{address}' is out of range 0 - #{@capacity}")
       end
 
-      if value < 0 || value > MAX_VALUE
-        raise ValueIsOutOfRange.new("Value '#{value}' is out of range 0 - #{MAX_VALUE}")
-      end
-
-      @data[address] = value
+      @data[address] = MachineWord.new(value)
     end
 
     def read(address)
-      @data[address]
+      @data[address].value
     end
   end
 end

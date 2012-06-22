@@ -1,5 +1,7 @@
 module BlahMachine
   class Processor
+    class UnknownInstruction < StandardError; end;
+
     ###############################################
     # Registers inxedes
 
@@ -30,6 +32,15 @@ module BlahMachine
       REGISTER_M3
     ]
 
+    ###############################################
+    # Instructions
+
+    SUM = 100
+    SUB = 101
+    JUMP = 110
+    JUMPX = 111
+    TERMINATE = 0 # terminate processor execution
+
     attr_reader :registers
 
     def initialize
@@ -42,12 +53,22 @@ module BlahMachine
       copy_command_and_data_from_memory_registers
     end
 
+    # excute instruction, located in C0
+    def execute_current_instruction
+      case read_register(REGISTER_C0)
+      when SUM
+        write_register(REGISTER_R0, read_register(REGISTER_D0) + read_register(REGISTER_D1))
+      else
+        raise UnknownInstruction.new("Instruction '#{read_register(REGISTER_C0)}' is undefined")
+      end
+    end
+
     def read_register(index)
-      @registers[index]
+      @registers[index].value
     end
 
     def write_register(index, value)
-      @registers[index] = value
+      @registers[index] = MachineWord.new(value)
     end
 
     private

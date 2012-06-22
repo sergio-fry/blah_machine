@@ -18,7 +18,7 @@ module BlahMachine
         end
         
         it "should be zero-filled" do
-          @processor.registers[Processor::REGISTER_C0].should eq(0)
+          @processor.registers[Processor::REGISTER_C0].value.should eq(0)
         end
       end
     end
@@ -26,7 +26,7 @@ module BlahMachine
     describe "#write_register" do
       it "should write value to register" do
         @processor.write_register(Processor::REGISTER_C0, 1)
-        @processor.registers[Processor::REGISTER_C0].should eq(1)
+        @processor.registers[Processor::REGISTER_C0].value.should eq(1)
       end
     end
 
@@ -48,6 +48,23 @@ module BlahMachine
         @processor.read_register(Processor::REGISTER_C0).should eq(1)
         @processor.read_register(Processor::REGISTER_D0).should eq(2)
         @processor.read_register(Processor::REGISTER_D1).should eq(3)
+      end
+
+      it "should excute current command"
+      it "should update pointer to next xommand"
+    end
+
+    describe "instruction" do
+      describe "SUM" do
+        it "should write result to R0" do
+          @processor.write_register(Processor::REGISTER_C0, Processor::SUM)
+          @processor.write_register(Processor::REGISTER_D0, 4)
+          @processor.write_register(Processor::REGISTER_D1, 3)
+
+          @processor.execute_current_instruction
+
+          @processor.read_register(Processor::REGISTER_R0).should eq(7)
+        end
       end
     end
   end
