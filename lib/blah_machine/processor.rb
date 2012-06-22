@@ -48,10 +48,15 @@ module BlahMachine
       end
     end
 
+    def move_instruction_pointer_to_a_next_address
+      write_register(REGISTER_M0, read_register(REGISTER_M0) + 3)
+    end
+
     # System Pre Cycle. Executed before Users Cycle
     def pre_cycle
       copy_value_fetch_from_memory
       initialize_memory_instruction_registers
+      move_instruction_pointer_to_a_next_address
     end
 
     # User Cycle

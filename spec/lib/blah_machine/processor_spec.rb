@@ -65,7 +65,14 @@ module BlahMachine
         @processor.read_register(Processor::REGISTER_M4).should eq(Memory::IDLE)
       end
 
-      it "should update pointer to next xommand"
+      it "should update pointer to next command" do
+        address_before = @processor.read_register(Processor::REGISTER_M0)
+        write_instruction(@processor, Processor::SUM, Processor::REGISTER_X0, Processor::REGISTER_X1)
+
+        @processor.next_cycle
+
+        @processor.read_register(Processor::REGISTER_M0).should eq(address_before + 3)
+      end
     end
 
     describe "instruction" do
@@ -104,7 +111,7 @@ module BlahMachine
       end
 
       describe "JUMPX" do
-        it "should update M0 if X1 == 0" do
+        it "should jump to X0 address if X1 == 0" do
           @processor.write_register(Processor::REGISTER_M0, 0)
           @processor.write_register(Processor::REGISTER_X0, 31)
           @processor.write_register(Processor::REGISTER_X1, 0)
@@ -116,7 +123,7 @@ module BlahMachine
           @processor.read_register(Processor::REGISTER_M0).should eq(31)
         end
 
-        it "should not update M0 if X1 != 0" do
+        it "should just go to a next instruction if X1 != 0" do
           @processor.write_register(Processor::REGISTER_M0, 0)
           @processor.write_register(Processor::REGISTER_X0, 31)
           @processor.write_register(Processor::REGISTER_X1, 1)
@@ -125,7 +132,7 @@ module BlahMachine
 
           @processor.next_cycle
 
-          @processor.read_register(Processor::REGISTER_M0).should eq(0)
+          @processor.read_register(Processor::REGISTER_M0).should eq(3)
         end
       end
 
