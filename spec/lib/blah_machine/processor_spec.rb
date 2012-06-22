@@ -81,9 +81,10 @@ module BlahMachine
         end
       end
 
-      describe "WRITE" do
+      describe "COPY" do
         it "should write value to specified register" do
-          write_instruction(@processor, Processor::WRITE, 4, Processor::REGISTER_M0)
+          @processor.write_register(Processor::REGISTER_X0, 4)
+          write_instruction(@processor, Processor::COPY, Processor::REGISTER_X0, Processor::REGISTER_M0)
 
           @processor.next_cycle
 
@@ -93,7 +94,8 @@ module BlahMachine
 
       describe "JUMP" do
         it "should update M0" do
-          write_instruction(@processor, Processor::JUMP, 33)
+          @processor.write_register(Processor::REGISTER_X0, 33)
+          write_instruction(@processor, Processor::JUMP, Processor::REGISTER_X0)
 
           @processor.next_cycle
 
@@ -102,52 +104,46 @@ module BlahMachine
       end
 
       describe "JUMPX" do
-        context "REGISTER_R0 is 0" do
-          before(:each) do
-            @processor.write_register(Processor::REGISTER_R0, 0)
-          end
+        it "should update M0 if X1 == 0" do
+          @processor.write_register(Processor::REGISTER_M0, 0)
+          @processor.write_register(Processor::REGISTER_X0, 31)
+          @processor.write_register(Processor::REGISTER_X1, 0)
 
-          it "should update M0" do
-            @processor.write_register(Processor::REGISTER_M0, 0)
+          write_instruction(@processor, Processor::JUMPX, Processor::REGISTER_X0, Processor::REGISTER_X1)
 
-            write_instruction(@processor, Processor::JUMPX, 31, Processor::REGISTER_R0)
+          @processor.next_cycle
 
-            @processor.next_cycle
-
-            @processor.read_register(Processor::REGISTER_M0).should eq(31)
-          end
+          @processor.read_register(Processor::REGISTER_M0).should eq(31)
         end
 
-        context "REGISTER_R0 is 1" do
-          before(:each) do
-            @processor.write_register(Processor::REGISTER_R0, 1)
-          end
+        it "should not update M0 if X1 != 0" do
+          @processor.write_register(Processor::REGISTER_M0, 0)
+          @processor.write_register(Processor::REGISTER_X0, 31)
+          @processor.write_register(Processor::REGISTER_X1, 1)
 
-          it "should update M0" do
-            @processor.write_register(Processor::REGISTER_M0, 0)
+          write_instruction(@processor, Processor::JUMPX, Processor::REGISTER_X0, Processor::REGISTER_X1)
 
-            write_instruction(@processor, Processor::JUMPX, 31, Processor::REGISTER_R0)
+          @processor.next_cycle
 
-            @processor.next_cycle
-
-            @processor.read_register(Processor::REGISTER_M0).should eq(0)
-          end
+          @processor.read_register(Processor::REGISTER_M0).should eq(0)
         end
       end
 
       describe "READ_MEM" do
         it "should write READ instruction to M4-M6" do
-          write_instruction(@processor, Processor::READ_MEM, 64, Processor::REGISTER_X0)
+          @processor.write_register(Processor::REGISTER_X0, 64)
+          write_instruction(@processor, Processor::READ_MEM, Processor::REGISTER_X0, Processor::REGISTER_X1)
 
           @processor.next_cycle
 
           @processor.read_register(Processor::REGISTER_M4).should eq(Memory::READ)
           @processor.read_register(Processor::REGISTER_M5).should eq(64)
-          @processor.read_register(Processor::REGISTER_M6).should eq(Processor::REGISTER_X0)
+          @processor.read_register(Processor::REGISTER_M6).should eq(Processor::REGISTER_X1)
         end
 
         it "should copy value from MEM to defined register" do
-          write_instruction(@processor, Processor::READ_MEM, 64, Processor::REGISTER_X0)
+          @processor.write_register(Processor::REGISTER_X0, 64)
+          write_instruction(@processor, Processor::READ_MEM, Processor::REGISTER_X0, Processor::REGISTER_X1)
 
           @processor.next_cycle
 
@@ -155,30 +151,21 @@ module BlahMachine
           @processor.write_register(Processor::REGISTER_M5, 47)
           @processor.next_cycle
 
-          @processor.read_register(Processor::REGISTER_X0).should eq(47)
+          @processor.read_register(Processor::REGISTER_X1).should eq(47)
         end
       end
 
       describe "WRITE_MEM" do
-        it "should write READ instruction to M4-M6" do
-          write_instruction(@processor, Processor::WRITE_MEM, 63, 65)
+        it "should write WRITE instruction to M4-M6" do
+          @processor.write_register(Processor::REGISTER_X0, 63)
+          @processor.write_register(Processor::REGISTER_X1, 65)
+          write_instruction(@processor, Processor::WRITE_MEM, Processor::REGISTER_X0, Processor::REGISTER_X1)
 
           @processor.next_cycle
 
           @processor.read_register(Processor::REGISTER_M4).should eq(Memory::WRITE)
           @processor.read_register(Processor::REGISTER_M5).should eq(63)
           @processor.read_register(Processor::REGISTER_M6).should eq(65)
-        end
-      end
-
-      describe "READ_MEM" do
-        it "should write READ instruction to M4-M6" do
-          write_instruction(@processor, Processor::READ_MEM, 64)
-
-          @processor.next_cycle
-
-          @processor.read_register(Processor::REGISTER_M4).should eq(Memory::READ)
-          @processor.read_register(Processor::REGISTER_M5).should eq(64)
         end
       end
     end

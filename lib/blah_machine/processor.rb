@@ -29,20 +29,20 @@ module BlahMachine
       case read_register(REGISTER_C0)
       when SUM
         write_register(REGISTER_R0, read_register(read_register(REGISTER_D0)) + read_register(read_register(REGISTER_D1)))
-      when WRITE
-        write_register(read_register(REGISTER_D1), read_register(REGISTER_D0))
+      when COPY
+        write_register(read_register(REGISTER_D1), read_register(read_register(REGISTER_D0)))
       when JUMP
-        write_register(REGISTER_M0, read_register(REGISTER_D0))
+        write_register(REGISTER_M0, read_register(read_register(REGISTER_D0)))
       when JUMPX
-        write_register(REGISTER_M0, read_register(REGISTER_D0)) if read_register(read_register(REGISTER_D1)) == 0
+        write_register(REGISTER_M0, read_register(read_register(REGISTER_D0))) if read_register(read_register(REGISTER_D1)) == 0
       when READ_MEM
         write_register(REGISTER_M4, Memory::READ)
-        write_register(REGISTER_M5, read_register(REGISTER_D0))
+        write_register(REGISTER_M5, read_register(read_register(REGISTER_D0)))
         write_register(REGISTER_M6, read_register(REGISTER_D1))
       when WRITE_MEM
         write_register(REGISTER_M4, Memory::WRITE)
-        write_register(REGISTER_M5, read_register(REGISTER_D0))
-        write_register(REGISTER_M6, read_register(REGISTER_D1))
+        write_register(REGISTER_M5, read_register(read_register(REGISTER_D0)))
+        write_register(REGISTER_M6, read_register(read_register(REGISTER_D1)))
       else
         raise UnknownInstruction.new("Instruction '#{read_register(REGISTER_C0)}' is undefined")
       end
