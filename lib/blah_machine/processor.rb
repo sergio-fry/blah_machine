@@ -51,7 +51,6 @@ module BlahMachine
     # System Pre Cycle. Executed before Users Cycle
     def pre_cycle
       copy_value_fetch_from_memory
-      copy_command_and_data_from_memory_registers
       initialize_memory_instruction_registers
     end
 
@@ -72,12 +71,6 @@ module BlahMachine
       REGISTER_INDEXES.each do |index|
         write_register(index, 0)
       end
-    end
-
-    def copy_command_and_data_from_memory_registers
-      write_register REGISTER_C0, read_register(REGISTER_M1)
-      write_register REGISTER_D0, read_register(REGISTER_M2)
-      write_register REGISTER_D1, read_register(REGISTER_M3)
     end
   end
 end

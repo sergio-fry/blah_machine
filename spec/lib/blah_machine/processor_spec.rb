@@ -3,9 +3,9 @@ require 'spec_helper.rb'
 module BlahMachine
   describe Processor do
     def write_instruction(processor, instruction, argument1=nil, argument2=nil)
-      processor.write_register(Processor::REGISTER_M1, instruction)
-      processor.write_register(Processor::REGISTER_M2, argument1) if argument1.present?
-      processor.write_register(Processor::REGISTER_M3, argument2) if argument2.present?
+      processor.write_register(Processor::REGISTER_C0, instruction)
+      processor.write_register(Processor::REGISTER_D0, argument1) if argument1.present?
+      processor.write_register(Processor::REGISTER_D1, argument2) if argument2.present?
     end
 
     before(:each) do
@@ -55,20 +55,11 @@ module BlahMachine
     end
 
     describe "#next_cycle" do
-      it "should copy command and data from memory registers" do
-        write_instruction(@processor, Processor::SUM, 2, 3)
-
+      it "should write idle command to M4" do
+        write_instruction(@processor, Processor::READ_MEM, 10, Processor::REGISTER_X0)
         @processor.next_cycle
 
-        @processor.read_register(Processor::REGISTER_C0).should eq(Processor::SUM)
-        @processor.read_register(Processor::REGISTER_D0).should eq(2)
-        @processor.read_register(Processor::REGISTER_D1).should eq(3)
-      end
-
-      it "should write idle command to M1" do
-        write_instruction(@processor, Processor::SUM, 2, 3)
-        @processor.write_register(Processor::REGISTER_M4, 1)
-
+        write_instruction(@processor, Processor::SUM, 1, 2)
         @processor.next_cycle
 
         @processor.read_register(Processor::REGISTER_M4).should eq(Memory::IDLE)

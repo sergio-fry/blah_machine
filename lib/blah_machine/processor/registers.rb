@@ -17,14 +17,7 @@ module BlahMachine
     REGISTER_R0 = 20
 
     # RAM
-    #
-    # Every cycle next command and its arguments
-    # are loaded to M1-M3 registers from RAM.
-    #
     REGISTER_M0 = 30 # pointer to next command
-    REGISTER_M1 = 31 # command
-    REGISTER_M2 = 32 # data
-    REGISTER_M3 = 33 # data
 
     # command for memory module
     REGISTER_M4 = 34 # memory command
@@ -45,9 +38,6 @@ module BlahMachine
       REGISTER_D1,
       REGISTER_R0,
       REGISTER_M0,
-      REGISTER_M1,
-      REGISTER_M2,
-      REGISTER_M3,
       REGISTER_M4,
       REGISTER_M5,
       REGISTER_M6,
@@ -70,6 +60,22 @@ module BlahMachine
       else
         raise UndefinedRegister.new("Register '#{index}' is udefined")
       end
+    end
+
+    # debuger output
+    def pretty_registers
+      {
+        :C0 => read_register(REGISTER_C0),
+        :D0 => read_register(REGISTER_D0),
+        :D1 => read_register(REGISTER_D1),
+        :M0 => read_register(REGISTER_M0),
+        :M4 => read_register(REGISTER_M4),
+        :M5 => read_register(REGISTER_M5),
+        :M6 => read_register(REGISTER_M6),
+        :X0 => read_register(REGISTER_X0),
+        :X1 => read_register(REGISTER_X1),
+        :X2 => read_register(REGISTER_X2),
+      }
     end
   end
 end
