@@ -2,10 +2,15 @@ require 'spec_helper.rb'
 
 module BlahMachine
   describe Processor do
+    def write_instruction(processor, instruction, argument1=nil, argument2=nil)
+      processor.write_register(Processor::REGISTER_M1, instruction)
+      processor.write_register(Processor::REGISTER_M2, argument1) if argument1.present?
+      processor.write_register(Processor::REGISTER_M3, argument2) if argument2.present?
+    end
+
     before(:each) do
       @processor = Processor.new
     end
-
 
     describe "registers" do
       it "should be hash" do
@@ -51,9 +56,7 @@ module BlahMachine
 
     describe "#next_cycle" do
       it "should copy command and data from memory registers" do
-        @processor.write_register(Processor::REGISTER_M1, Processor::SUM)
-        @processor.write_register(Processor::REGISTER_M2, 2)
-        @processor.write_register(Processor::REGISTER_M3, 3)
+        write_instruction(@processor, Processor::SUM, 2, 3)
 
         @processor.next_cycle
 
@@ -63,9 +66,7 @@ module BlahMachine
       end
 
       it "should write idle command to M1" do
-        @processor.write_register(Processor::REGISTER_M1, Processor::SUM)
-        @processor.write_register(Processor::REGISTER_M2, 2)
-        @processor.write_register(Processor::REGISTER_M3, 3)
+        write_instruction(@processor, Processor::SUM, 2, 3)
         @processor.write_register(Processor::REGISTER_M4, 1)
 
         @processor.next_cycle
@@ -79,9 +80,7 @@ module BlahMachine
     describe "instruction" do
       describe "SUM" do
         it "should write result to R0" do
-          @processor.write_register(Processor::REGISTER_M1, Processor::SUM)
-          @processor.write_register(Processor::REGISTER_M2, 4)
-          @processor.write_register(Processor::REGISTER_M3, 3)
+          write_instruction(@processor, Processor::SUM, 4, 3)
 
           @processor.next_cycle
 
@@ -91,9 +90,7 @@ module BlahMachine
 
       describe "WRITE" do
         it "should write value to specified register" do
-          @processor.write_register(Processor::REGISTER_M1, Processor::WRITE)
-          @processor.write_register(Processor::REGISTER_M2, 4)
-          @processor.write_register(Processor::REGISTER_M3, Processor::REGISTER_M0)
+          write_instruction(@processor, Processor::WRITE, 4, Processor::REGISTER_M0)
 
           @processor.next_cycle
 
@@ -103,8 +100,7 @@ module BlahMachine
 
       describe "JUMP" do
         it "should update M0" do
-          @processor.write_register(Processor::REGISTER_M1, Processor::JUMP)
-          @processor.write_register(Processor::REGISTER_M2, 33)
+          write_instruction(@processor, Processor::JUMP, 33)
 
           @processor.next_cycle
 
@@ -121,9 +117,7 @@ module BlahMachine
           it "should update M0" do
             @processor.write_register(Processor::REGISTER_M0, 0)
 
-            @processor.write_register(Processor::REGISTER_M1, Processor::JUMPX)
-            @processor.write_register(Processor::REGISTER_M2, 31)
-            @processor.write_register(Processor::REGISTER_M3, Processor::REGISTER_R0)
+            write_instruction(@processor, Processor::JUMPX, 31, Processor::REGISTER_R0)
 
             @processor.next_cycle
 
@@ -139,9 +133,7 @@ module BlahMachine
           it "should update M0" do
             @processor.write_register(Processor::REGISTER_M0, 0)
 
-            @processor.write_register(Processor::REGISTER_M1, Processor::JUMPX)
-            @processor.write_register(Processor::REGISTER_M2, 31)
-            @processor.write_register(Processor::REGISTER_M3, Processor::REGISTER_R0)
+            write_instruction(@processor, Processor::JUMPX, 31, Processor::REGISTER_R0)
 
             @processor.next_cycle
 
@@ -152,9 +144,7 @@ module BlahMachine
 
       describe "READ_MEM" do
         it "should write READ instruction to M4-M6" do
-          @processor.write_register(Processor::REGISTER_M1, Processor::READ_MEM)
-          @processor.write_register(Processor::REGISTER_M2, 64)
-          @processor.write_register(Processor::REGISTER_M3, Processor::REGISTER_X0)
+          write_instruction(@processor, Processor::READ_MEM, 64, Processor::REGISTER_X0)
 
           @processor.next_cycle
 
@@ -164,9 +154,7 @@ module BlahMachine
         end
 
         it "should copy value from MEM to defined register" do
-          @processor.write_register(Processor::REGISTER_M1, Processor::READ_MEM)
-          @processor.write_register(Processor::REGISTER_M2, 64)
-          @processor.write_register(Processor::REGISTER_M3, Processor::REGISTER_X0)
+          write_instruction(@processor, Processor::READ_MEM, 64, Processor::REGISTER_X0)
 
           @processor.next_cycle
 
@@ -180,9 +168,7 @@ module BlahMachine
 
       describe "WRITE_MEM" do
         it "should write READ instruction to M4-M6" do
-          @processor.write_register(Processor::REGISTER_M1, Processor::WRITE_MEM)
-          @processor.write_register(Processor::REGISTER_M2, 63)
-          @processor.write_register(Processor::REGISTER_M3, 65)
+          write_instruction(@processor, Processor::WRITE_MEM, 63, 65)
 
           @processor.next_cycle
 
@@ -194,8 +180,7 @@ module BlahMachine
 
       describe "READ_MEM" do
         it "should write READ instruction to M4-M6" do
-          @processor.write_register(Processor::REGISTER_M1, Processor::READ_MEM)
-          @processor.write_register(Processor::REGISTER_M2, 64)
+          write_instruction(@processor, Processor::READ_MEM, 64)
 
           @processor.next_cycle
 
