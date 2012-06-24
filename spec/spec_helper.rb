@@ -7,7 +7,7 @@
 
 require 'bundler/setup'
 Bundler.require
-require File.expand_path('../../lib/blah_machine.rb', __FILE__)
+require 'blah_machine'
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true

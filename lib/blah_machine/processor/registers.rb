@@ -1,7 +1,5 @@
 module BlahMachine
   module ProcessorRegisters
-    extend ActiveSupport::Concern
-
     class UndefinedRegister < StandardError; end;
 
     attr_reader :registers

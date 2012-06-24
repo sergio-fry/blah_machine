@@ -7,8 +7,12 @@ module BlahMachine
     READ = 1
     WRITE = 2
 
+    # Registers
+    REGISTER_C0 = 0
+    REGISTER_D0 = 10
+
     def initialize(capacity)
-      @data  = (0..capacity-1).to_a.map { MachineWord.new(0) }
+      @data  = (0..capacity-1).to_a.map { MachineWord.new(nil) }
       @capacity = capacity
     end
 
