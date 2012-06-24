@@ -8,8 +8,8 @@ module BlahMachine
 
         # infinit loop
         @machine.processor.write_register(Processor::REGISTER_M0, 0)
-        @machine.memory.write(0, Processor::JUMP)
-        @machine.memory.write(1, 0)
+        @machine.memory.data[0] = MachineWord.new(Processor::JUMP)
+        @machine.memory.data[1] = MachineWord.new(0)
       end
 
       it "should initialize memory" do
@@ -36,9 +36,9 @@ module BlahMachine
           @machine.processor.write_register(Processor::REGISTER_M0, 3)
 
           # write instruction to memory
-          @machine.memory.write(3, Processor::SUM)
-          @machine.memory.write(4, Processor::REGISTER_X0)
-          @machine.memory.write(5, Processor::REGISTER_X1)
+          @machine.memory.data[3] = MachineWord.new(Processor::SUM)
+          @machine.memory.data[4] = MachineWord.new(Processor::REGISTER_X0)
+          @machine.memory.data[5] = MachineWord.new(Processor::REGISTER_X1)
 
           @machine.next_cycle
 
@@ -49,7 +49,7 @@ module BlahMachine
 
         context "processor send READ instruction to MEM" do
           before(:each) do
-            @machine.memory.write(7, 87)
+            @machine.memory.data[7] = MachineWord.new(87)
 
             # emulate READ sygnal from processor
             @machine.processor.write_register(Processor::REGISTER_M4, Memory::READ)
