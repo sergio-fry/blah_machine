@@ -12,8 +12,11 @@ module BlahMachine
     # jump to address writen in X0 if X1 == 0
     #   JUMPX X0, X1
     #
-    # copy rexister X0 to X1
+    # copy register X0 to X1
     #   COPY X0, X1
+    #
+    # write value 8 to X1
+    #   WRITE 8, X1
     # 
     # read value from address written in X0 to X1
     #   READ_MEM X0, X1
@@ -25,6 +28,7 @@ module BlahMachine
     JUMP = 110
     JUMPX = 111
     COPY = 120
+    WRITE = 121
     READ_MEM = 130
     WRITE_MEM = 131
   end

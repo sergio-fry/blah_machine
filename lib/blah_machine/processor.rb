@@ -31,6 +31,8 @@ module BlahMachine
         write_register(REGISTER_R0, read_register(read_register(REGISTER_D0)) + read_register(read_register(REGISTER_D1)))
       when COPY
         write_register(read_register(REGISTER_D1), read_register(read_register(REGISTER_D0)))
+      when WRITE
+        write_register(read_register(REGISTER_D1), read_register(REGISTER_D0))
       when JUMP
         write_register(REGISTER_M0, read_register(read_register(REGISTER_D0)))
       when JUMPX

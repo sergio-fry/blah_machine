@@ -89,13 +89,23 @@ module BlahMachine
       end
 
       describe "COPY" do
-        it "should write value to specified register" do
+        it "should write value of one register to another" do
           @processor.write_register(Processor::REGISTER_X0, 4)
           write_instruction(@processor, Processor::COPY, Processor::REGISTER_X0, Processor::REGISTER_M0)
 
           @processor.next_cycle
 
           @processor.read_register(Processor::REGISTER_M0).should eq(4)
+        end
+      end
+
+      describe "WRITE" do
+        it "should write value to specified register" do
+          write_instruction(@processor, Processor::WRITE, 874, Processor::REGISTER_M0)
+
+          @processor.next_cycle
+
+          @processor.read_register(Processor::REGISTER_M0).should eq(874)
         end
       end
 
