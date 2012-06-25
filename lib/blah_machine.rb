@@ -11,3 +11,5 @@ require "blah_machine/processor/instructions"
 require "blah_machine/processor.rb"
 
 require "blah_machine/machine.rb"
+
+require "blah_machine/translator.rb"
