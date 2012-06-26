@@ -8,9 +8,9 @@ module BlahMachine
 
 
       source_code = <<SOURCE
-      WRITE 9, X0
-      JUMP X0
+      JUMP @start
       34 65 0
+      @start
       WRITE 6, X0
       READ_MEM X0, X1
       WRITE 7, X0
@@ -18,8 +18,7 @@ module BlahMachine
       SUM X1, X2
       WRITE 8, X0
       WRITE_MEM X0, R0
-      WRITE 33, X0
-      JUMP X0
+      JUMP @start
 SOURCE
       
       machine_code = Translator.translate(source_code)

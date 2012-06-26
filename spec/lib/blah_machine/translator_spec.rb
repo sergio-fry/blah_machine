@@ -17,38 +17,67 @@ module BlahMachine
       end
     end
 
-    it "should translate SUM program to machine code" do
-      source_code = <<SOURCE
-      WRITE 9, X0
-      JUMP X0
-      34 65 0
-      WRITE 6, X0
-      READ_MEM X0, X1
-      WRITE 7, X0
-      READ_MEM X0, X2
-      SUM X1, X2
-      WRITE 8, X0
-      WRITE_MEM X0, R0
-      WRITE 33, X0
-      JUMP X0
+    context "only one meta JUMP instruction exists" do
+      it "should translate jump labels to absoulute addresses" do
+        source_code =<<SOURCE
+      JUMP @label_1
+      @label_1
+      WRITE 9, X1
 SOURCE
 
-      machine_code = [
-        Processor::WRITE, 9, Processor::REGISTER_X0,
-        Processor::JUMP, Processor::REGISTER_X0, 0,
-        34, 65, 0,
-        Processor::WRITE, 6, Processor::REGISTER_X0,
-        Processor::READ_MEM, Processor::REGISTER_X0, Processor::REGISTER_X1,
-        Processor::WRITE, 7, Processor::REGISTER_X0,
-        Processor::READ_MEM, Processor::REGISTER_X0, Processor::REGISTER_X2,
-        Processor::SUM, Processor::REGISTER_X1, Processor::REGISTER_X2,
-        Processor::WRITE, 8, Processor::REGISTER_X0,
-        Processor::WRITE_MEM, Processor::REGISTER_X0, Processor::REGISTER_R0,
-        Processor::WRITE, 33, Processor::REGISTER_X0,
-        Processor::JUMP, Processor::REGISTER_X0, 0,
-      ].map { |w| MachineWord.new(w) }
+        Translator.translate(source_code).map{|w| w.value}.should eq([
+          Processor::WRITE, 6, Processor::REGISTER_X0,
+          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 9, Processor::REGISTER_X1
+        ])
 
-      Translator.translate(source_code).map { |w| w.value }.should eq(machine_code.map { |w| w.value })
+      end
+    end
+
+    context "2 meta-jumps to the same label exists" do
+      it "should translate jump labels to absoulute addresses" do
+        source_code =<<SOURCE
+      JUMP @label_1
+      @label_1
+      WRITE 9, X1
+      JUMP @label_1
+      WRITE 9, X1
+SOURCE
+
+        Translator.translate(source_code).map{|w| w.value}.should eq([
+          Processor::WRITE, 6, Processor::REGISTER_X0,
+          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 9, Processor::REGISTER_X1,
+          Processor::WRITE, 6, Processor::REGISTER_X0,
+          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 9, Processor::REGISTER_X1,
+        ])
+
+      end
+    end
+
+    context "2 meta-jumps to the same label exists" do
+      it "should translate jump labels to absoulute addresses" do
+        source_code =<<SOURCE
+      JUMP @label_1
+      @label_2
+      WRITE 9, X1
+      JUMP @label_2
+      WRITE 9, X1
+      @label_1
+      WRITE 9, X1
+SOURCE
+
+        Translator.translate(source_code).map{|w| w.value}.should eq([
+          Processor::WRITE, 18, Processor::REGISTER_X0,
+          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 9, Processor::REGISTER_X1,
+          Processor::WRITE, 6, Processor::REGISTER_X0,
+          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 9, Processor::REGISTER_X1,
+          Processor::WRITE, 9, Processor::REGISTER_X1,
+        ])
+      end
     end
   end
 end
