@@ -21,7 +21,7 @@ module BlahMachine
       JUMP @start
 SOURCE
       
-      machine_code = Translator.translate(source_code)
+      machine_code = AssemblerProgram.new(source_code).compile
 
       @machine.memory.data[0..machine_code.size-1] = machine_code
     end
