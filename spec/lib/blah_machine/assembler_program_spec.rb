@@ -26,8 +26,8 @@ module BlahMachine
 SOURCE
 
         AssemblerProgram.new(source_code).compile.map{|w| w.value}.should eq([
-          Processor::WRITE, 6, Processor::REGISTER_X0,
-          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 6, Processor::REGISTER_M0,
+          0, 0, 0,
           Processor::WRITE, 9, Processor::REGISTER_X1
         ])
       end
@@ -44,11 +44,10 @@ SOURCE
 SOURCE
 
         AssemblerProgram.new(source_code).compile.map{|w| w.value}.should eq([
-          Processor::WRITE, 6, Processor::REGISTER_X0,
-          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 6, Processor::REGISTER_M0,
+          0, 0, 0,
           Processor::WRITE, 9, Processor::REGISTER_X1,
-          Processor::WRITE, 6, Processor::REGISTER_X0,
-          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 6, Processor::REGISTER_M0,
           Processor::WRITE, 9, Processor::REGISTER_X1,
         ])
 
@@ -68,15 +67,17 @@ SOURCE
 SOURCE
 
         AssemblerProgram.new(source_code).compile.map{|w| w.value}.should eq([
-          Processor::WRITE, 18, Processor::REGISTER_X0,
-          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 18, Processor::REGISTER_M0,
+          0, 0, 0,
           Processor::WRITE, 9, Processor::REGISTER_X1,
-          Processor::WRITE, 6, Processor::REGISTER_X0,
-          Processor::JUMP, Processor::REGISTER_X0, 0,
+          Processor::WRITE, 6, Processor::REGISTER_M0,
           Processor::WRITE, 9, Processor::REGISTER_X1,
+          0, 0, 0,
           Processor::WRITE, 9, Processor::REGISTER_X1,
         ])
       end
     end
+
+    it "should compile meta JUMPX"
   end
 end

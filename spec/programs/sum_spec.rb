@@ -11,12 +11,12 @@ module BlahMachine
       JUMP @start
       34 65 0
       @start
-      WRITE 6, X0
+      WRITE 3, X0
       READ_MEM X0, X1
-      WRITE 7, X0
+      WRITE 4, X0
       READ_MEM X0, X2
       SUM X1, X2
-      WRITE 8, X0
+      WRITE 5, X0
       WRITE_MEM X0, R0
       JUMP @start
 SOURCE
@@ -31,7 +31,7 @@ SOURCE
         @machine.next_cycle
       end
 
-      @machine.memory.data[8].value.should eq(34 + 65)
+      @machine.memory.data[5].value.should eq(34 + 65)
     end
   end
 end

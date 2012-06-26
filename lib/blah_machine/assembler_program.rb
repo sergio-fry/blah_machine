@@ -28,8 +28,6 @@ module BlahMachine
 
         line_number = line_number + 1
       end
-
-      @lines = @lines.reject { |line| line.split[0].match(JUMP_LABEL_REGEXP) }
     end
 
     def translate_meta_jumps
@@ -40,15 +38,12 @@ module BlahMachine
           instruction, label_name  = line.split
           if instruction == "JUMP" and label_name.match(JUMP_LABEL_REGEXP)
             @lines[line_number..line_number] = [
-              "WRITE #{@jump_labels[label_name] * 3 + 3}, X0",
-              "JUMP X0"
+              "WRITE #{@jump_labels[label_name] * 3 + 3}, M0",
             ]
           end
 
           line_number = line_number + 1
         end
-
-
       end
     end
 
