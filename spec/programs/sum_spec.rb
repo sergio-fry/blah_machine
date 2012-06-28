@@ -8,17 +8,18 @@ module BlahMachine
 
 
       source_code = <<SOURCE
-      JUMP @start
+      WRITE 9, X0
+      JUMP X0
       34 65 0
-      @start
-      WRITE 3, X0
+      WRITE 6, X0
       READ_MEM X0, X1
-      WRITE 4, X0
+      WRITE 7, X0
       READ_MEM X0, X2
       SUM X1, X2
-      WRITE 5, X0
+      WRITE 8, X0
       WRITE_MEM X0, R0
-      JUMP @start
+      WRITE 0, X0
+      JUMP X0
 SOURCE
       
       machine_code = AssemblerProgram.new(source_code).compile
@@ -31,7 +32,7 @@ SOURCE
         @machine.next_cycle
       end
 
-      @machine.memory.data[5].value.should eq(34 + 65)
+      @machine.memory.data[8].value.should eq(34 + 65)
     end
   end
 end
