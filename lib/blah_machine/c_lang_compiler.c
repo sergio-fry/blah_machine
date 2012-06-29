@@ -34,6 +34,19 @@ int strcmp(char* str1, char* str2) {
   return result;
 }
 
+int strcpy(char* src, char* dest) {
+  int length = strlen(src);
+
+  int i = 0;
+  while(i <= length) {
+    dest[i] = src[i];
+
+    i++;
+  }
+
+  return 0;
+}
+
 const int STATE_ROOT = 0;
 
 // Function defenition (FD)
@@ -94,6 +107,8 @@ int next_state (int* current_state, char* token) {
     if(strcmp(token, "}") == 0) {
       *current_state = STATE_FD_BODY_END;
     }
+  } else if(*current_state == STATE_FD_BODY_END) {
+    *current_state = STATE_FD_TYPE;
   }
 
   return result;
@@ -125,6 +140,8 @@ int read_next_token(char* source_code, int* current_position, char* token) {
   return 0;
 }
 
+const int FUNCTIONS_TABLE_MAX_SIZE = 255;
+
 int main() {
   char* source_code = "\
   int sum(int a, int b) {\
@@ -140,12 +157,20 @@ int main() {
   int current_position = 0;
   int current_state = STATE_ROOT;
 
+  char functions_table[FUNCTIONS_TABLE_MAX_SIZE][255];
+  int functions_count = 0;
+
   while(current_position < source_code_length) {
     read_next_token(source_code, &current_position, token);
 
     next_state(&current_state, token);
 
-    printf("%s %d\n", token, current_state);
+
+    if(current_state == STATE_FD_NAME) {
+      strcpy(token, functions_table[functions_count++]);
+    }
+
+    /*printf("%s %d\n", token, current_state);*/
   }
 
   return 0;
