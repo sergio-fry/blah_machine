@@ -1,23 +1,8 @@
-# BlahMachine
+require 'spec_helper.rb'
 
-Dummy machine emulator
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'blah_processor'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install blah_processor
-
-## Usage
-
+module BlahMachine
+  describe "sum program" do
+    before(:each) do
       @machine = Machine.new(32.kilobytes)
 
       source_code = <<SOURCE
@@ -38,18 +23,14 @@ SOURCE
       machine_code = AssemblerProgram.new(source_code).compile
 
       @machine.memory.data[0..machine_code.size-1] = machine_code
+    end
 
+    it "should work" do
       10.times do
         @machine.next_cycle
       end
 
       @machine.memory.data[8].value.should eq(34 + 65)
-
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+    end
+  end
+end
