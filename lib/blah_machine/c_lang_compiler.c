@@ -206,7 +206,6 @@ int read_next_token(char* source_code, int* current_position, char* token) {
       position++; i++;
     }
     token[i] = '\0';
-
   } else {
     token[0] = source_code[position];
     token[1] = '\0';
@@ -216,6 +215,30 @@ int read_next_token(char* source_code, int* current_position, char* token) {
   *current_position = position;
 }
 
+int read_expression_inside_bracets(char* source_code, int* current_position, char* expression) {
+  int opened_bracets;
+  char token[255];
+
+  expression[0] = '\0';
+
+  opened_bracets = 1;
+  *current_position = *current_position + 1; // skip first bracet
+
+  while(opened_bracets > 0) {
+    read_next_token(source_code, current_position, token);
+
+    if(mystrcmp(token, ")") == 0) {
+      opened_bracets--;
+    } else if(mystrcmp(token, "(") == 0) {
+      opened_bracets++;
+    }
+
+    if(opened_bracets > 0) {
+      mystrappend(expression, token);
+    }
+  }
+}
+
 const int FUNCTIONS_TABLE_MAX_SIZE = 255;
 const int VARIABLES_TABLE_MAX_SIZE = 255;
 const int STATEMENT_MAX_SIZE = 1024;
@@ -223,25 +246,39 @@ const int STATEMENT_MAX_SIZE = 1024;
 int convert_statement_to_functions(char* statement, char* result) {
   char statement_tmp[STATEMENT_MAX_SIZE];
 
-
   int statement_length = mystrlen(statement);
 
   int position = 0;
   char token[255]; token[0] = '\0';
-  char previous_token[255];
+  char argument_1[255];
+  char argument_1_prepared[255];
   char statement_tail[STATEMENT_MAX_SIZE];
   char statement_tail_prepared[STATEMENT_MAX_SIZE];
   int i;
 
   // find first operation
-  while((position < statement_length) && mystrcmp(token, "=") * mystrcmp(token, "+") != 0) {
-    mystrcpy(token, previous_token);
+  while(position < statement_length) {
+
+    if(mystrcmp(token, "=") * mystrcmp(token, "+") == 0) {
+      break;
+    } else if (mystrcmp(token, "(") == 0) {
+      // read expression inside bracets ( ... )
+      position--;
+      read_expression_inside_bracets(statement, &position, argument_1);
+    } else {
+      mystrcpy(token, argument_1);
+    }
+
     read_next_token(statement, &position, token);
   }
 
   if(position >= statement_length) {
-    // empty statement
-    sprintf(result, "%s", token);
+    if(mystrlen(argument_1) > 0) {
+      convert_statement_to_functions(argument_1, argument_1_prepared);
+      sprintf(result, "%s", argument_1_prepared);
+    } else {
+      sprintf(result, "%s", token);
+    }
   } else {
     i = 0;
 
@@ -252,9 +289,11 @@ int convert_statement_to_functions(char* statement, char* result) {
     }
 
     convert_statement_to_functions(statement_tail, statement_tail_prepared);
-    sprintf(result, "%s(%s, %s)", token, previous_token, statement_tail_prepared);
+    convert_statement_to_functions(argument_1, argument_1_prepared);
+    sprintf(result, "%s(%s, %s)", token, argument_1_prepared, statement_tail_prepared);
   }
 
+  printf("%s -> %s \n", statement, result);
 }
 
 int main() {
@@ -267,7 +306,9 @@ int main() {
   int main() { \n\
     int a; \
     int b; \
+    a = (b + (a + c + 1)) + 34; \
     a = b + 1 + 34; \
+    a = (b + 1) + 34; \
     b = a + b + a + 4 + a; \
     return 0; \n\
   }";
@@ -301,7 +342,6 @@ int main() {
 
       convert_statement_to_functions(statement, statement_prepared);
 
-      printf("%s \n", statement_prepared);
     }
   }
 
