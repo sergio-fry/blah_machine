@@ -1,6 +1,20 @@
 #include <stdio.h>
+int mystrappend(char* str1, char* str2) {
+  int str1_length = mystrlen(str1);
+  int str2_length = mystrlen(str2);
 
-int strlen(char* str) {
+  int i = 0;
+
+  while(i < str2_length) {
+    str1[str1_length + i] = str2[i];
+    i++;
+  }
+  str1[str1_length + i] = '\0';
+
+  return 0;
+}
+
+int mystrlen(char* str) {
   int i = 0;
 
   while(str[i] != 0) {
@@ -12,11 +26,11 @@ int strlen(char* str) {
 
 // 0 - equal
 // 1 - not equal
-int strcmp(char* str1, char* str2) {
+int mystrcmp(char* str1, char* str2) {
   int result = 0;
-  int length = strlen(str1);
+  int length = mystrlen(str1);
 
-  if(strlen(str1) == strlen(str2)) {
+  if(mystrlen(str1) == mystrlen(str2)) {
     int i = 0;
 
     while(i < length) {
@@ -34,8 +48,8 @@ int strcmp(char* str1, char* str2) {
   return result;
 }
 
-int strcpy(char* src, char* dest) {
-  int length = strlen(src);
+int mystrcpy(char* src, char* dest) {
+  int length = mystrlen(src);
 
   int i = 0;
   while(i <= length) {
@@ -59,6 +73,7 @@ const int STATE_FD_ARGUMENTS_LIST_END = 17;
 const int STATE_FD_BODY_START = 18;
 const int STATE_FD_BODY = 19;
 const int STATE_FD_BODY_END = 20;
+const int STATE_FD_RETURN = 21;
 
 // Variable defenition
 const int STATE_VD_TYPE = 30;
@@ -80,7 +95,7 @@ int is_identifier_char(char ch) {
 }
 
 int is_identifier(char* str) {
-  int length = strlen(str), result = 1;
+  int length = mystrlen(str), result = 1;
 
   int i = 0;
   while(i < length) {
@@ -120,28 +135,32 @@ int next_state (int* current_state, char* token) {
   } else if(*current_state == STATE_FD_NAME) {
     *current_state = STATE_FD_ARGUMENTS_LIST_START;
   } else if(*current_state == STATE_FD_ARGUMENTS_LIST_START) {
-    if(strcmp(token, ")") == 0) {
+    if(mystrcmp(token, ")") == 0) {
       *current_state = STATE_FD_ARGUMENTS_LIST_END;
     }
   } else if(*current_state == STATE_FD_ARGUMENTS_LIST_END) {
-    if(strcmp(token, "{") == 0) {
+    if(mystrcmp(token, "{") == 0) {
       *current_state = STATE_FD_BODY_START;
     }
   } else if(*current_state == STATE_FD_BODY_START) {
-    if(strcmp(token, "}") != 0) {
+    if(mystrcmp(token, "}") != 0) {
       *current_state = STATE_FD_BODY;
       next_state(current_state, token);
     }
   } else if(*current_state == STATE_FD_BODY) {
-    if(strcmp(token, "}") == 0) {
+    if(mystrcmp(token, "}") == 0) {
       *current_state = STATE_FD_BODY_END;
-    } else if(strcmp(token, "int") == 0) {
+    } else if(mystrcmp(token, "int") == 0) {
       *current_state = STATE_VD_TYPE;
+    } else if(mystrcmp(token, "return") == 0) {
+      *current_state = STATE_FD_RETURN;
     } else if(is_identifier(token)) {
       *current_state = STATE_STATEMENT;
     }
+  } else if(*current_state == STATE_FD_RETURN) {
+    *current_state = STATE_STATEMENT;
   } else if (*current_state == STATE_STATEMENT) {
-    if(strcmp(token, ";") == 0) {
+    if(mystrcmp(token, ";") == 0) {
       *current_state = STATE_FD_BODY;
     }
   } else if(*current_state == STATE_VD_TYPE) {
@@ -156,6 +175,12 @@ int next_state (int* current_state, char* token) {
   return result;
 }
 
+int read_next_token_and_update_state(char* source_code, int* current_position, int* current_state, char* token) {
+  read_next_token(source_code, current_position, token);
+  next_state(current_state, token);
+
+  return 0;
+}
 
 int read_next_token(char* source_code, int* current_position, char* token) {
   int position = *current_position;
@@ -178,12 +203,56 @@ int read_next_token(char* source_code, int* current_position, char* token) {
   }
 
   *current_position = position;
-
-  return 0;
 }
 
 const int FUNCTIONS_TABLE_MAX_SIZE = 255;
 const int VARIABLES_TABLE_MAX_SIZE = 255;
+const int STATEMENT_MAX_SIZE = 1024;
+
+int convert_statement_to_functions(char* statement, char* result) {
+  char statement_tmp[STATEMENT_MAX_SIZE];
+
+
+  int statement_length = mystrlen(statement);
+
+  int position = 0;
+  char token[255]; token[0] = '\0';
+  char previous_token[255];
+  char statement_tail[STATEMENT_MAX_SIZE];
+  char statement_tail_prepared[STATEMENT_MAX_SIZE];
+  int i;
+
+  /*
+   * 1. найти самое первое сложение
+   * 2. найти аргумент A слева
+   * 3. вызвать рекурсивно +(A, "остальное выражение")
+   *
+   */
+
+
+  // find first operation
+  while((position < statement_length) && mystrcmp(token, "=") * mystrcmp(token, "+") != 0) {
+    mystrcpy(token, previous_token);
+    read_next_token(statement, &position, token);
+  }
+
+  if(position >= statement_length) {
+    // empty statement
+    sprintf(result, "%s", token);
+  } else {
+    i = 0;
+
+    // read the rest statement
+    while(position <= statement_length) {
+      statement_tail[i] = statement[position];
+      position++; i++;
+    }
+
+    convert_statement_to_functions(statement_tail, statement_tail_prepared);
+    sprintf(result, "%s(%s, %s)", token, previous_token, statement_tail_prepared);
+  }
+
+}
 
 int main() {
   char* source_code = "\
@@ -193,10 +262,14 @@ int main() {
     return c; \
   } \
   int main() { \n\
+    int a; \
+    int b; \
+    a = b + 1 + 34; \
+    b = a + b + a + 4 + a; \
     return 0; \n\
   }";
 
-  int source_code_length = strlen(source_code);
+  int source_code_length = mystrlen(source_code);
   char token[255];
 
   int current_position = 0;
@@ -205,12 +278,28 @@ int main() {
   char functions_table[FUNCTIONS_TABLE_MAX_SIZE][255];
   int functions_count = 0;
 
+  char statement[STATEMENT_MAX_SIZE];
+  char statement_prepared[STATEMENT_MAX_SIZE];
+
   while(current_position < source_code_length) {
-    read_next_token(source_code, &current_position, token);
+    read_next_token_and_update_state(source_code, &current_position, &current_state, token);
 
-    next_state(&current_state, token);
+    if(current_state == STATE_STATEMENT) {
+      statement[0] = '\0';
 
-    printf("%2d | %s \n", current_state, token);
+      mystrappend(statement, token);
+
+      while(current_state == STATE_STATEMENT) {
+        read_next_token_and_update_state(source_code, &current_position, &current_state, token);
+        if (current_state == STATE_STATEMENT) {
+          mystrappend(statement, token);
+        }
+      }
+
+      convert_statement_to_functions(statement, statement_prepared);
+
+      printf("%s \n", statement_prepared);
+    }
   }
 
   return 0;
