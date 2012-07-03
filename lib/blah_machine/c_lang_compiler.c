@@ -81,6 +81,10 @@ const int STATE_VD_NAME = 31;
 
 const STATE_STATEMENT = 40;
 
+int is_digit(char ch) {
+  return (ch >= '0' && ch <= '9');
+}
+
 int is_identifier_first_char(char ch) {
   return (ch >= 'a' && ch <= 'z') || 
     (ch >= 'A' && ch <= 'Z');
@@ -90,7 +94,7 @@ int is_identifier_char(char ch) {
 
   return (ch >= 'a' && ch <= 'z') || 
     (ch >= 'A' && ch <= 'Z') ||
-    (ch >= '0' && ch <= '9') ||
+    is_digit(ch) ||
     ch == '_';
 }
 
@@ -196,6 +200,13 @@ int read_next_token(char* source_code, int* current_position, char* token) {
       position++; i++;
     }
     token[i] = '\0';
+  } else if(is_digit(source_code[position])) {
+    while(is_digit(source_code[position])) {
+      token[i] = source_code[position];
+      position++; i++;
+    }
+    token[i] = '\0';
+
   } else {
     token[0] = source_code[position];
     token[1] = '\0';
@@ -221,14 +232,6 @@ int convert_statement_to_functions(char* statement, char* result) {
   char statement_tail[STATEMENT_MAX_SIZE];
   char statement_tail_prepared[STATEMENT_MAX_SIZE];
   int i;
-
-  /*
-   * 1. найти самое первое сложение
-   * 2. найти аргумент A слева
-   * 3. вызвать рекурсивно +(A, "остальное выражение")
-   *
-   */
-
 
   // find first operation
   while((position < statement_length) && mystrcmp(token, "=") * mystrcmp(token, "+") != 0) {
