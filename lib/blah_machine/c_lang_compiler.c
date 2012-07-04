@@ -306,6 +306,7 @@ int main() {
   int main() { \n\
     int a; \
     int b; \
+    a = b = 2; \
     a = (b + (a + c + 1)) + 34; \
     a = b + 1 + 34; \
     a = (b + 1) + 34; \

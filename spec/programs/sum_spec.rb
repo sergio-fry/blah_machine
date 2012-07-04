@@ -33,4 +33,34 @@ SOURCE
       @machine.memory.data[8].value.should eq(34 + 65)
     end
   end
+
+  describe "Sub-procedure call" do
+    # Memory struction:
+    #
+    # R0-1: program loader
+    # R2: call stack pointer (points to the first free cell after stack)
+    # R3: last procedure return value
+    # R4-M: procedures
+    # RM+1-N: call stack
+
+    # Procedure stucture
+    #
+
+
+    # Call stack unit structure (inversed relative addresses)
+    #
+    # R0: return address (Jump)
+    # R1-N: variables
+    #
+    #
+
+    # Procedure call live-cycle
+    #
+    # * allocate memory in stack
+    # * write return address to the R0
+    # * write argument variables to stack
+    # * procedure writes returned value to the R3 memory register
+    # * jump to adrress pointed in R0 stack register
+
+  end
 end
