@@ -45,6 +45,9 @@ SOURCE
 
       @machine.memory.data[8].value.should eq(34 + 65)
 
+## TODO
+* C Compiler: function call
+
 
 ## Contributing
 
