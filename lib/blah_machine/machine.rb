@@ -13,6 +13,12 @@ module BlahMachine
       processor.next_cycle
     end
 
+    def write_firmware(firmware)
+      (0..firmware.size-1).each do |register|
+        write_memory(register, firmware[register])
+      end
+    end
+
     private
 
     def send_instruction_from_proccessor_to_memory
@@ -47,6 +53,15 @@ module BlahMachine
       memory.next_cycle
 
       memory.read_register(Memory::REGISTER_D1)
+    end
+
+    def write_memory(address, value)
+      memory.write_register(Memory::REGISTER_C0, Memory::WRITE)
+      memory.write_register(Memory::REGISTER_D0, address)
+      memory.write_register(Memory::REGISTER_D1, value)
+      memory.next_cycle
+
+      memory.read_register(Memory::REGISTER_S0)
     end
   end
 end

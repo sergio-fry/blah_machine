@@ -13,3 +13,4 @@ require "blah_machine/processor.rb"
 require "blah_machine/machine.rb"
 
 require "blah_machine/assembler_program.rb"
+require "blah_machine/c_lang_program.rb"

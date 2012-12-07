@@ -63,6 +63,14 @@ module BlahMachine
           end
         end
       end
+
+      describe "#write_firmware" do
+        it "should write data to memory" do
+          program = [1, 4, 3, 7, 8, 9]
+          @machine.write_firmware(program)
+          @machine.memory.data[0..program.size-1].map(&:value).should eq(program)
+        end
+      end
     end
   end
 end
