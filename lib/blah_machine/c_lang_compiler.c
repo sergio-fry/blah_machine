@@ -66,7 +66,7 @@ const int STATE_ROOT = 0;
 // Function defenition (FD)
 const int STATE_FD_TYPE = 10;
 const int STATE_FD_NAME = 12;
-const int STATE_FD_ARGUMENTS_LIST_START = 14;
+const int STATE_FD_ARGUMENTS_LIST = 14;
 const int STATE_FD_ARGUMENT_TYPE = 15;
 const int STATE_FD_ARGUMENT_NAME = 16;
 const int STATE_FD_ARGUMENTS_LIST_END = 17;
@@ -137,10 +137,20 @@ int next_state (int* current_state, char* token) {
   } else if(*current_state == STATE_FD_TYPE) {
     *current_state = STATE_FD_NAME;
   } else if(*current_state == STATE_FD_NAME) {
-    *current_state = STATE_FD_ARGUMENTS_LIST_START;
-  } else if(*current_state == STATE_FD_ARGUMENTS_LIST_START) {
+    *current_state = STATE_FD_ARGUMENTS_LIST;
+  } else if(*current_state == STATE_FD_ARGUMENTS_LIST) {
     if(mystrcmp(token, ")") == 0) {
       *current_state = STATE_FD_ARGUMENTS_LIST_END;
+    } else if (*current_state == STATE_FD_ARGUMENTS_LIST) {
+      *current_state = STATE_FD_ARGUMENT_TYPE;
+    }
+  } else if (*current_state == STATE_FD_ARGUMENT_TYPE ) {
+    *current_state = STATE_FD_ARGUMENT_NAME;
+  } else if (*current_state == STATE_FD_ARGUMENT_NAME ) {
+    if(mystrcmp(token, ")") == 0) {
+      *current_state = STATE_FD_ARGUMENTS_LIST_END;
+    } else if (mystrcmp(token, ",") == 0) {
+      *current_state = STATE_FD_ARGUMENTS_LIST;
     }
   } else if(*current_state == STATE_FD_ARGUMENTS_LIST_END) {
     if(mystrcmp(token, "{") == 0) {
@@ -176,6 +186,7 @@ int next_state (int* current_state, char* token) {
     *current_state = STATE_FD_TYPE;
   }
 
+  /*printf("%d: %s \n", *current_state, token);*/
   return result;
 }
 
@@ -292,35 +303,29 @@ int convert_statement_to_functions(char* statement, char* result) {
     convert_statement_to_functions(argument_1, argument_1_prepared);
     sprintf(result, "%s(%s, %s)", token, argument_1_prepared, statement_tail_prepared);
   }
-
-  printf("%s -> %s \n", statement, result);
 }
 
 int main() {
   char* source_code = "\
-  int sum(int a, int b) {\
-    int c; \
-    c = a + b; \
-    return c; \
-  } \
-  int main() { \n\
+  int sum(int a, int b) { \
+    return a + b;\
+  }\
+  \
+  int main(int a, int b, int c) { \n\
     int a; \
-    int b; \
-    a = b = 2; \
-    a = (b + (a + c + 1)) + 34; \
-    a = b + 1 + 34; \
-    a = (b + 1) + 34; \
-    b = a + b + a + 4 + a; \
+\
     return 0; \n\
   }";
 
+  int i; // for loops
   int source_code_length = mystrlen(source_code);
   char token[255];
 
   int current_position = 0;
   int current_state = STATE_ROOT;
 
-  char functions_table[FUNCTIONS_TABLE_MAX_SIZE][255];
+  char functions_names[FUNCTIONS_TABLE_MAX_SIZE][255];
+  int functions_variables_count[FUNCTIONS_TABLE_MAX_SIZE];
   int functions_count = 0;
 
   char statement[STATEMENT_MAX_SIZE];
@@ -329,11 +334,23 @@ int main() {
   while(current_position < source_code_length) {
     read_next_token_and_update_state(source_code, &current_position, &current_state, token);
 
+    if(current_state == STATE_FD_NAME) {
+      mystrcpy(token, functions_names[functions_count]);
+      functions_count++;
+      functions_variables_count[functions_count-1] = 0; // init variables counter
+    }
+
+    // count function arguments
+    if(current_state == STATE_FD_ARGUMENT_NAME) {
+      functions_variables_count[functions_count-1]++;
+    }
+
     if(current_state == STATE_STATEMENT) {
       statement[0] = '\0';
 
       mystrappend(statement, token);
 
+      // read whole statement
       while(current_state == STATE_STATEMENT) {
         read_next_token_and_update_state(source_code, &current_position, &current_state, token);
         if (current_state == STATE_STATEMENT) {
@@ -342,9 +359,17 @@ int main() {
       }
 
       convert_statement_to_functions(statement, statement_prepared);
-
     }
+  }
+
+  printf("Functions List:\n");
+
+  i=0;
+  while(i < functions_count){
+    printf("  %s (%d)\n", functions_names[i], functions_variables_count[i]);
+    i++;
   }
 
   return 0;
 }
+

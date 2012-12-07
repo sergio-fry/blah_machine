@@ -2,10 +2,13 @@ require 'spec_helper.rb'
 
 module BlahMachine
   describe "sum program" do
-    before(:each) do
+    before do
       @machine = Machine.new(32.kilobytes)
+    end
 
-      source_code = <<SOURCE
+    describe "assembler code" do
+      before(:each) do
+        source_code = <<SOURCE
       WRITE 9, X0
       JUMP X0
       34 65 0
@@ -19,22 +22,37 @@ module BlahMachine
       WRITE 0, X0
       JUMP X0
 SOURCE
-      
-      machine_code = AssemblerProgram.new(source_code).compile
 
-      @machine.memory.data[0..machine_code.size-1] = machine_code
-    end
+        machine_code = AssemblerProgram.new(source_code).compile
 
-    it "should work" do
-      10.times do
-        @machine.next_cycle
+        @machine.memory.data[0..machine_code.size-1] = machine_code
       end
 
-      @machine.memory.data[8].value.should eq(34 + 65)
+      it "should work" do
+        10.times do
+          @machine.next_cycle
+        end
+
+        @machine.memory.data[8].value.should eq(34 + 65)
+      end
     end
   end
 
-  describe "Sub-procedure call" do
+  describe "compiled from c lang" do
+    before do
+      @program = <<PROGRAM
+      int main() {
+        int a;
+        int b;
+        a = 2;
+        b = 5;
+
+        return a + b;
+      }
+PROGRAM
+      @byte_code = CLangProgram.new(@program).compile
+    end
+
     # Memory struction:
     #
     # R0-1: program loader
@@ -62,5 +80,14 @@ SOURCE
     # * procedure writes returned value to the R3 memory register
     # * jump to adrress pointed in R0 stack register
 
+    it "should write sum result to R3 register" do
+      p @byte_code
+
+      10.times do
+        @machine.next_cycle
+      end
+
+      @machine.memory.data[3].value.should eq(2+5)
+    end
   end
 end
