@@ -370,6 +370,17 @@ int main() {
     i++;
   }
 
+  printf("ASM Program\n");
+
+  i = 0;
+
+  // GOTO main loader
+  printf("%d: WRITE 21 X0\n", i); i += 3;
+  printf("%d: JUMP X0\n", i); i += 3;
+
+  // TODO: allocate memory for main function call
+  // TODO: jump to main function
+
   return 0;
 }
 

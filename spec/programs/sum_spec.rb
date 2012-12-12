@@ -80,14 +80,7 @@ PROGRAM
     # * procedure writes returned value to the R3 memory register
     # * jump to adrress pointed in R0 stack register
 
-    it "should write sum result to R3 register" do
-      p @byte_code
-
-      10.times do
-        @machine.next_cycle
-      end
-
-      @machine.memory.data[3].value.should eq(2+5)
-    end
+    it "should allocate memory in stack for main function"
+    it "should call main function"
   end
 end
